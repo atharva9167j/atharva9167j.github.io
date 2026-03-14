@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+
+@layer base {
+  :root {
+    --background: 0 0% 5%;
+    --foreground: 60 45% 96%;
+
+    --card: 0 0% 7%;
+    --card-foreground: 60 45% 96%;
+
+    --popover: 0 0% 5%;
+    --popover-foreground: 60 45% 96%;
+
+    --primary: 40 38% 73%;
+    --primary-foreground: 0 0% 5%;
+
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 60 45% 96%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 40 38% 73%;
+    --accent-foreground: 0 0% 5%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 40 38% 73%;
+
+    --radius: 0.15rem;
+
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 60 45% 96%;
+    --sidebar-primary: 40 38% 73%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 60 45% 96%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 40 38% 73%;
+  }
+
+  .dark {
+    --background: 0 0% 5%;
+    --foreground: 60 45% 96%;
+
+    --card: 0 0% 7%;
+    --card-foreground: 60 45% 96%;
+
+    --popover: 0 0% 5%;
+    --popover-foreground: 60 45% 96%;
+
+    --primary: 40 38% 73%;
+    --primary-foreground: 0 0% 5%;
+
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 60 45% 96%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 40 38% 73%;
+    --accent-foreground: 0 0% 5%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 40 38% 73%;
+
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 60 45% 96%;
+    --sidebar-primary: 40 38% 73%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 60 45% 96%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 40 38% 73%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}

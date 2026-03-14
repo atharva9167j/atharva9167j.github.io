@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://atharvaj1234.github.io/sitemap.xml

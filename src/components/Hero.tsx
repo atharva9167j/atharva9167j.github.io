@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState, useRef, useMemo } from "react";
 import { ChevronDown } from "lucide-react";
 
-const TOTAL_FRAMES = 360; // Number of frames extracted via ffmpeg (60fps)
+const TOTAL_FRAMES = 180; // Number of optimized deduplicated frames
 
 interface HeroProps {
 	onProgress?: (progress: number) => void;
@@ -18,29 +18,95 @@ export const Hero = ({ onProgress }: HeroProps = {}) => {
 	
 	const loadedImagesRef = useRef<HTMLImageElement[]>([]);
 
-	// Preload images
+	// Load single binary stream of all frames
 	useEffect(() => {
-		let loadedCount = 0;
-		for (let i = 1; i <= TOTAL_FRAMES; i++) {
-			const img = new Image();
-			const paddedIndex = i.toString().padStart(4, '0');
-			img.src = `/hero_frames_webp/frame_${paddedIndex}.webp`;
-			
-			img.onload = () => {
-				loadedCount++;
-				setImagesLoaded(loadedCount);
-				
-				if (onProgress) {
-					onProgress(Math.round((loadedCount / TOTAL_FRAMES) * 100));
+		let isCancelled = false;
+		const blobUrls: string[] = [];
+
+		const loadBinaryFrames = async () => {
+			try {
+				const response = await fetch('/hero_frames.bin');
+				if (!response.ok || !response.body) {
+					throw new Error(`Failed to fetch hero_frames.bin: ${response.status}`);
 				}
 
-                if (loadedCount === 1) {
-                    // Draw first frame immediately if canvas is ready
-                    drawFrameToCanvas(0);
-                }
-			};
-			loadedImagesRef.current.push(img);
-		}
+				const contentLength = +(response.headers.get('Content-Length') || 0);
+				const reader = response.body.getReader();
+				const chunks: Uint8Array[] = [];
+				let receivedBytes = 0;
+
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) break;
+					if (isCancelled) return;
+
+					chunks.push(value);
+					receivedBytes += value.length;
+					if (contentLength && onProgress) {
+						// Stream progress smoothly up to 92%
+						const percent = Math.min(92, Math.round((receivedBytes / contentLength) * 92));
+						onProgress(percent);
+					}
+				}
+
+				// Combine stream chunks into contiguous ArrayBuffer
+				const totalBuffer = new Uint8Array(receivedBytes);
+				let pos = 0;
+				for (const chunk of chunks) {
+					totalBuffer.set(chunk, pos);
+					pos += chunk.length;
+				}
+
+				const dataView = new DataView(totalBuffer.buffer, totalBuffer.byteOffset, totalBuffer.byteLength);
+				const frameCount = dataView.getUint32(4, true);
+
+				const frameLengths: number[] = [];
+				for (let i = 0; i < frameCount; i++) {
+					frameLengths.push(dataView.getUint32(8 + i * 4, true));
+				}
+
+				let byteOffset = 8 + frameCount * 4;
+				const images: HTMLImageElement[] = [];
+
+				for (let i = 0; i < frameCount; i++) {
+					const len = frameLengths[i];
+					const frameBytes = totalBuffer.subarray(byteOffset, byteOffset + len);
+					const blob = new Blob([frameBytes], { type: 'image/webp' });
+					const url = URL.createObjectURL(blob);
+					blobUrls.push(url);
+
+					const img = new Image();
+					img.src = url;
+					images.push(img);
+					byteOffset += len;
+				}
+
+				if (isCancelled) return;
+
+				loadedImagesRef.current = images;
+				setImagesLoaded(frameCount);
+				if (onProgress) {
+					onProgress(100);
+				}
+
+				if (images[0]) {
+					if (images[0].complete) {
+						drawFrameToCanvas(0);
+					} else {
+						images[0].onload = () => drawFrameToCanvas(0);
+					}
+				}
+			} catch (err) {
+				console.error("Error loading hero frames binary:", err);
+			}
+		};
+
+		loadBinaryFrames();
+
+		return () => {
+			isCancelled = true;
+			blobUrls.forEach((url) => URL.revokeObjectURL(url));
+		};
 	}, []);
 
 	// Handle Canvas & Drawing
@@ -50,7 +116,23 @@ export const Hero = ({ onProgress }: HeroProps = {}) => {
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 
-		const img = loadedImagesRef.current[frameIndex];
+		let img = loadedImagesRef.current[frameIndex];
+		if (!img || !img.complete || img.naturalWidth === 0) {
+			// Fallback to nearest loaded frame to avoid any blank flashes
+			for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
+				const before = loadedImagesRef.current[frameIndex - offset];
+				if (before && before.complete && before.naturalWidth > 0) {
+					img = before;
+					break;
+				}
+				const after = loadedImagesRef.current[frameIndex + offset];
+				if (after && after.complete && after.naturalWidth > 0) {
+					img = after;
+					break;
+				}
+			}
+		}
+
 		if (!img || !img.complete || img.naturalWidth === 0) return;
 
 		// Set canvas size to match the window container accurately

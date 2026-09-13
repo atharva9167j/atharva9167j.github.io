@@ -18,16 +18,19 @@ export const Hero = ({ onProgress }: HeroProps = {}) => {
 	
 	const loadedImagesRef = useRef<HTMLImageElement[]>([]);
 
-	// Load single binary stream of all frames
+	// Load single binary stream of all frames (responsive mobile vs desktop)
 	useEffect(() => {
 		let isCancelled = false;
 		const blobUrls: string[] = [];
 
 		const loadBinaryFrames = async () => {
 			try {
-				const response = await fetch('/hero_frames.bin');
+				const isMobile = window.innerWidth < 768;
+				const binUrl = isMobile ? '/hero_frames_mobile.bin' : '/hero_frames.bin';
+
+				const response = await fetch(binUrl);
 				if (!response.ok || !response.body) {
-					throw new Error(`Failed to fetch hero_frames.bin: ${response.status}`);
+					throw new Error(`Failed to fetch ${binUrl}: ${response.status}`);
 				}
 
 				const contentLength = +(response.headers.get('Content-Length') || 0);
@@ -109,31 +112,35 @@ export const Hero = ({ onProgress }: HeroProps = {}) => {
 		};
 	}, []);
 
-	// Handle Canvas & Drawing
-	const drawFrameToCanvas = (frameIndex: number) => {
+	const getFrame = (index: number) => {
+		const clamped = Math.max(0, Math.min(TOTAL_FRAMES - 1, index));
+		let img = loadedImagesRef.current[clamped];
+		if (!img || !img.complete || img.naturalWidth === 0) {
+			// Fallback to nearest loaded frame to avoid any blank flashes
+			for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
+				const before = loadedImagesRef.current[clamped - offset];
+				if (before && before.complete && before.naturalWidth > 0) return before;
+				const after = loadedImagesRef.current[clamped + offset];
+				if (after && after.complete && after.naturalWidth > 0) return after;
+			}
+		}
+		return img;
+	};
+
+	// Handle Canvas & Drawing with smooth alpha cross-fading
+	const drawFrameToCanvas = (exactFrame: number) => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 
-		let img = loadedImagesRef.current[frameIndex];
-		if (!img || !img.complete || img.naturalWidth === 0) {
-			// Fallback to nearest loaded frame to avoid any blank flashes
-			for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
-				const before = loadedImagesRef.current[frameIndex - offset];
-				if (before && before.complete && before.naturalWidth > 0) {
-					img = before;
-					break;
-				}
-				const after = loadedImagesRef.current[frameIndex + offset];
-				if (after && after.complete && after.naturalWidth > 0) {
-					img = after;
-					break;
-				}
-			}
-		}
+		const clamped = Math.max(0, Math.min(TOTAL_FRAMES - 1, exactFrame));
+		const frameAIndex = Math.floor(clamped);
+		const frameBIndex = Math.min(TOTAL_FRAMES - 1, frameAIndex + 1);
+		const frac = clamped - frameAIndex;
 
-		if (!img || !img.complete || img.naturalWidth === 0) return;
+		const imgA = getFrame(frameAIndex);
+		if (!imgA || !imgA.complete || imgA.naturalWidth === 0) return;
 
 		// Set canvas size to match the window container accurately
 		if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
@@ -142,17 +149,32 @@ export const Hero = ({ onProgress }: HeroProps = {}) => {
 		}
 
 		// CSS object-cover equivalent drawing
-		const ratio = Math.max(canvas.width / img.width, canvas.height / img.height);
+		const ratio = Math.max(canvas.width / imgA.width, canvas.height / imgA.height);
 		
 		// Shift video to show more of the right side on mobile devices
 		const isMobile = window.innerWidth < 768;
 		const xAlignment = isMobile ? 0.356 : 0.5;
 		
-		const x = (canvas.width - img.width * ratio) * xAlignment;
-		const y = (canvas.height - img.height * ratio) / 1;
+		const x = (canvas.width - imgA.width * ratio) * xAlignment;
+		const y = (canvas.height - imgA.height * ratio) / 1;
+		const drawW = imgA.width * ratio;
+		const drawH = imgA.height * ratio;
 		
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		ctx.drawImage(img, 0, 0, img.width, img.height, x, y, img.width * ratio, img.height * ratio);
+
+		// Draw base frame A
+		ctx.globalAlpha = 1;
+		ctx.drawImage(imgA, 0, 0, imgA.width, imgA.height, x, y, drawW, drawH);
+
+		// Blend frame B on top if between frames
+		if (frac > 0.02 && frameAIndex !== frameBIndex) {
+			const imgB = getFrame(frameBIndex);
+			if (imgB && imgB.complete && imgB.naturalWidth > 0) {
+				ctx.globalAlpha = frac;
+				ctx.drawImage(imgB, 0, 0, imgB.width, imgB.height, x, y, drawW, drawH);
+				ctx.globalAlpha = 1;
+			}
+		}
 	};
 
 	// Scroll listener & Render Loop
@@ -170,26 +192,25 @@ export const Hero = ({ onProgress }: HeroProps = {}) => {
 			}
             
             setScrollProgress(progress);
-			// Calculate target frame (0 to 191)
+			// Calculate target frame (0 to TOTAL_FRAMES - 1)
 			targetFrameRef.current = progress * (TOTAL_FRAMES - 1);
 		};
 
-		const handleResize = () => drawFrameToCanvas(Math.round(currentFrameRef.current));
+		const handleResize = () => drawFrameToCanvas(currentFrameRef.current);
 
 		window.addEventListener("scroll", handleScroll, { passive: true });
         // Handle resize so canvas redraws crisply
         window.addEventListener("resize", handleResize);
         handleScroll();
 
-		// Lerping Animation Loop for butter-smooth scrubbing
+		// Lerping Animation Loop for butter-smooth scrubbing with cross-fade
 		let animationFrameId: number;
 		const render = () => {
             // Lerp mathematical formula: current = current + (target - current) * factor
             // A factor of 0.08 offers a buttery smooth catch-up without feeling detached
 			currentFrameRef.current += (targetFrameRef.current - currentFrameRef.current) * 0.08;
 			
-            const roundedFrame = Math.round(currentFrameRef.current);
-			drawFrameToCanvas(roundedFrame);
+			drawFrameToCanvas(currentFrameRef.current);
 
 			animationFrameId = requestAnimationFrame(render);
 		};

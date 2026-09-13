@@ -3,7 +3,7 @@ export const Experience = () => {
     {
       title: "Freelance Project Developer",
       company: "Freelance",
-      period: "September 2024 - Present (10 months)",
+      period: "September 2024 - Present",
       location: "Remote",
       description: "Specialized in developing responsive websites, scalable web applications, and android applications using Expo. Assisted with project development and provided tailored digital solutions from concept to deployment with a focus on high-quality architecture.",
       current: true

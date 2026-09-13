@@ -19,13 +19,13 @@ export const Education = () => {
     {
       institution: "Fr. Conceicao Rodrigues College of Engineering",
       degree: "B.Tech in Computer Science & Engineering",
-      period: "August 2022 - Present",
+      period: "August 2025 - Present",
       description: "Focus on advanced algorithms, software engineering principles, and scalable system design."
     },
     {
       institution: "Vidyavardhini's Bhausaheb Vartak Polytechnic",
       degree: "Diploma in Computer Engineering",
-      period: "July 2022 - April 2025",
+      period: "July 2022 - May 2025",
       description: "Graduated with 93.4%. Specialized in core computing and development."
     }
   ];

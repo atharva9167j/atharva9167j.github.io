@@ -11,7 +11,7 @@ export const Experience = () => {
     {
       title: "Full Stack Web Development Intern",
       company: "Edba Academy",
-      period: "April 2024 - June 2025 (3 months)",
+      period: "April 2024 - June 2024 (3 months)",
       location: "Virar West",
       description: "Optimized UI/UX enhancing interactivity by 20%. Built fast, responsive front-ends and improved load times by 15%. Developed scalable back-ends and designed RESTful APIs. Integrated Gemini APIs to enhance AI features.",
       current: false

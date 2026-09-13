@@ -7,6 +7,7 @@ interface Project {
   description: string;
   technologies: string[];
   link: string;
+  tag?: string;
   image: string;
   modalImages?: string[];
   featured?: boolean;
@@ -38,6 +39,7 @@ export const Projects = () => {
       description: "An advanced AI-powered platform for rapidly building, designing, and collaborating on professional presentations. It uses large language models to transform simple text prompts into fully structured, visually stunning slides, streamlining the presentation creation process for users.",
       technologies: ["React", "TypeScript", "Vite", "Google AI SDK", "AI Integration", "Tailwind CSS"],
       link: "https://preso-ai.vercel.app",
+      tag: "Live",
       image: "/images/preso/preso_ss1.jpeg",
       modalImages: [
         "/images/preso/preso_ss1.jpeg",
@@ -55,6 +57,7 @@ export const Projects = () => {
       title: "Glyphify - Android and IOS Application",
       description: "Glyphify is a cutting-edge mobile application designed to revolutionize the way teachers and students handle information. By leveraging intelligent AI, Glyphify effortlessly extracts text from documents, converting handwritten notes and printed materials into editable digital text. This powerful tool streamlines workflows, saves valuable time, and bridges the gap between the physical and digital worlds for both educators and learners.",
       technologies: ["React-native", "CSS", "JavaScript", "Google Generative AI"],
+      tag: "View on Website",
       link: "https://atharva9167j.github.io/Glyphify",
       image: "/images/glyphify/glyphify_ss1.png",
       modalImages: ["/images/glyphify/glyphify_ss1.png", "/images/glyphify/glyphify_ss2.png"],
@@ -65,6 +68,7 @@ export const Projects = () => {
       description: "Created a GenAI-based Figma plugin that streamlines the creation workflow by generating intelligent design proposals and mockups from textual input. Integrated advanced language models with the canvas for smart element placement and prompt-to-interface transformation, improving UI/UX creation efficiency by 25%.",
       technologies: ["Tailwind CSS", "Google Generative AI", "Google Dev Kit", "Python Flask API", "Firebase"],
       link: "https://github.com/atharva9167j/Designo",
+      tag: "View on GitHub",
       image: "/images/designo/designo_ss1.png",
       modalImages: ["/images/designo/designo_ss1.png", "/images/designo/designo_ss2.png", "/images/designo/designo_ss3.png"],
       featured: true
@@ -83,6 +87,7 @@ export const Projects = () => {
       description: "Built an AI-driven learning platform enhancing quantitative, verbal, logical reasoning, and data interpretation through interactive practice, assessments, real-time feedback, gamification, and performance analytics.",
       technologies: ["React.js", "Node.js", "Firebase", "Generative AI"],
       link: "https://github.com/atharva9167j/SkilsElevate_Aptitude_Assessment_Tool",
+      tag: "View on GitHub",
       image: "/images/skillselevate/skillselevate_ss1.png",
       modalImages: ["/images/skillselevate/skillselevate_ss1.png", "/images/skillselevate/skillselevate_ss2.png", "/images/skillselevate/skillselevate_ss3.png"],
     },
@@ -91,6 +96,7 @@ export const Projects = () => {
       description: "Engineered a real-time American Sign Language (ASL) recognition system leveraging MediaPipe and React, effectively bridging communication gaps for hearing-impaired individuals.",
       technologies: ["TypeScript", "React.js", "Node.js", "Jupyter", "Google Cloud", "MediaPipe"],
       link: "https://github.com/atharva9167j/Sign-Language-Translator",
+      tag: "View on GitHub",
       image: "/images/signlangtrans/signlangtrans_ss1.png",
       modalImages: ["/images/signlangtrans/signlangtrans_ss1.png"],
     },
@@ -99,6 +105,7 @@ export const Projects = () => {
       description: "Implemented a full-stack telehealth platform facilitating remote healthcare consultations, secure management of medical records, and streamlined digital appointment scheduling, improving patient access and administrative efficiency.",
       technologies: ["JavaScript", "React.js", "Node.js", "SQLite"],
       link: "https://github.com/atharva9167j/Heath-Consultant-System",
+      tag: "View on GitHub",
       image: "/images/healthconsystem/healthconsystem_ss1.png",
       modalImages: ["/images/healthconsystem/healthconsystem_ss1.png", "/images/healthconsystem/healthconsystem_ss2.png", "/images/healthconsystem/healthconsystem_ss3.png", "/images/healthconsystem/healthconsystem_ss4.png", "/images/healthconsystem/healthconsystem_ss5.png"],
     }
@@ -110,7 +117,7 @@ export const Projects = () => {
       description: "Engineered a high-performance library to convert DOM nodes to editable PPTX, achieving 99% visual fidelity across gradients, shadows, and complex layouts. Handled complex CSS mapping for 50+ style properties, providing a lightweight alternative to server-side exports and reducing server costs by 100%.",
       technologies: ["TypeScript", "CSS", "Geometry NPM"],
       link: "https://www.npmjs.com/package/dom-to-pptx",
-      image: "https://media.licdn.com/dms/image/v2/D5622AQHCchb6N2qgzQ/feedshare-shrink_2048_1536/B56ZruwYpxH8Aw-/0/1764942254378?e=1775088000&v=beta&t=oqU5F5DnBMGD4bRg3q2Xbj9NTvzXQW75_-B1O-5U80I", // Placeholder image
+      image: "/images/domtopptx/release.png",
       modalImages: [],
       featured: true
     },
@@ -194,7 +201,7 @@ export const Projects = () => {
                     <h3 className="text-2xl md:text-3xl font-serif text-foreground group-hover:text-primary transition-colors">{project.title}</h3>
                     {project.link !== "#" && (
                       <a href={project.link} target="_blank" rel="noopener noreferrer" className="opacity-0 md:translate-x-4 md:group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500 delay-100" onClick={(e) => e.stopPropagation()}>
-                        <span className="text-xs font-sans uppercase tracking-[0.2em] border-b border-primary/50 text-foreground hover:text-primary pb-1">Live ↗</span>
+                        <span className="text-xs font-sans uppercase tracking-[0.2em] border-b border-primary/50 text-foreground hover:text-primary pb-1">{project.tag} ↗</span>
                       </a>
                     )}
                   </div>

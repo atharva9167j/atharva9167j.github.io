@@ -7,7 +7,7 @@ export const About = () => {
 
   // Call hooks unconditionally at the top level
   const experienceCounter = useCounterAnimation({ end: 3, suffix: '+', decimals: 0, start: isVisible });
-  const projectsCounter = useCounterAnimation({ end: 50, suffix: '+', decimals: 0, delay: 200, start: isVisible });
+  const projectsCounter = useCounterAnimation({ end: 35, suffix: '+', decimals: 0, delay: 200, start: isVisible });
   const academicCounter = useCounterAnimation({ end: 93.4, suffix: '%', decimals: 1, delay: 400, start: isVisible });
 
   useEffect(() => {

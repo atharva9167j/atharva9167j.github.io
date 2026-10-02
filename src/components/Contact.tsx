@@ -1,5 +1,6 @@
-import { Mail, Phone, Linkedin, MapPin } from "lucide-react";
+import { Mail, Phone, Linkedin, MapPin, Sparkles } from "lucide-react";
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export const Contact = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -118,12 +119,21 @@ export const Contact = () => {
           {/* Call to Action */}
           <div className="pt-16 border-t border-border/50">
             <h3 className="text-2xl lg:text-3xl font-serif text-foreground mb-8">Ready to Start Your Project?</h3>
-            <a
-              href="mailto:atharvaj365@gmail.com"
-              className="inline-flex items-center justify-center bg-primary text-primary-foreground font-sans px-10 py-5 uppercase tracking-[0.2em] text-xs hover:bg-primary/90 transition-colors"
-            >
-              Start Your Project Today ↗
-            </a>
+            <div className="flex flex-wrap gap-4 items-center">
+              <a
+                href="mailto:atharvaj365@gmail.com"
+                className="inline-flex items-center justify-center bg-primary text-primary-foreground font-sans px-10 py-5 uppercase tracking-[0.2em] text-xs hover:bg-primary/90 transition-colors"
+              >
+                Start Your Project Today ↗
+              </a>
+              <Link
+                to="/links"
+                className="inline-flex items-center justify-center gap-2 border border-primary/30 text-foreground hover:text-primary hover:border-primary/60 font-sans px-8 py-5 uppercase tracking-[0.2em] text-xs transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-primary" />
+                <span>Link in Bio & UPI</span>
+              </Link>
+            </div>
           </div>
 
         </div>

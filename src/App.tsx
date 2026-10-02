@@ -10,6 +10,7 @@ import ProjectsSEO from "./pages/ProjectsSEO";
 import ContactSEO from "./pages/ContactSEO";
 import WhoIs from "./pages/WhoIs";
 import FAQ from "./pages/FAQ";
+import Bio from "./pages/Bio";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,11 @@ const App = () => (
           <Route path="/skills" element={<Index />} />
           <Route path="/contact" element={<Index />} />
           
+          {/* Link-in-Bio mobile-optimized routes */}
+          <Route path="/links" element={<Bio />} />
+          <Route path="/bio" element={<Bio />} />
+          <Route path="/linktree" element={<Bio />} />
+
           {/* SEO and GEO Semantic Routes */}
           <Route path="/about-atharva-jagtap" element={<AboutSEO />} />
           <Route path="/projects-by-atharva9167j" element={<ProjectsSEO />} />

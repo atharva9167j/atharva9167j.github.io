@@ -51,7 +51,7 @@ const quickIcons: QuickIconItem[] = [
 export const BioQuickIcons: React.FC = () => {
   return (
     <div className="w-full mb-10 flex items-center justify-center">
-      <div className="flex items-center justify-center gap-6">
+      <div className="flex items-center justify-between w-full">
         {quickIcons.map((item) => {
           const isDirect = item.url.startsWith("tel:") || item.url.startsWith("mailto:");
           return (

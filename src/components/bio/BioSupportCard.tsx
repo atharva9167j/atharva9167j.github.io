@@ -45,36 +45,19 @@ export const BioSupportCard: React.FC<BioSupportCardProps> = ({ payment }) => {
   };
 
   const handleDownloadQr = () => {
-    // Generate simple SVG to PNG download or open in new window
-    const svgElement = document.querySelector("#bio-upi-qr svg");
-    if (!svgElement) return;
+    const imgElement = document.querySelector("#bio-upi-qr img") as HTMLImageElement | null;
+    if (!imgElement || !imgElement.src) {
+      toast.error("QR Code image not ready yet.");
+      return;
+    }
 
-    const svgData = new XMLSerializer().serializeToString(svgElement);
-    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-    const URL = window.URL || window.webkitURL || window;
-    const blobURL = URL.createObjectURL(svgBlob);
-    
-    const image = new Image();
-    image.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 400;
-      canvas.height = 400;
-      const context = canvas.getContext("2d");
-      if (context) {
-        context.fillStyle = "#121212";
-        context.fillRect(0, 0, 400, 400);
-        context.drawImage(image, 0, 0, 400, 400);
-        const pngUrl = canvas.toDataURL("image/png");
-        const downloadLink = document.createElement("a");
-        downloadLink.href = pngUrl;
-        downloadLink.download = `Atharva-Jagtap-UPI-QR.png`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        toast.success("QR Code downloaded as PNG!");
-      }
-    };
-    image.src = blobURL;
+    const downloadLink = document.createElement("a");
+    downloadLink.href = imgElement.src;
+    downloadLink.download = `Atharva-Jagtap-UPI-QR.png`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    toast.success("QR Code downloaded as PNG!");
   };
 
   return (

@@ -160,17 +160,18 @@ export const bioConfig: BioConfig = {
 /**
  * Builds standard UPI deep-link URL conforming to NPCI specification:
  * upi://pay?pa=<UPI_ID>&pn=<NAME>&am=<AMOUNT>&cu=<CURRENCY>&tn=<NOTE>
+ * Note: 'pa' must contain literal '@', spaces must be %20 (not +)
  */
 export function buildUpiPayUrl(payment: PaymentConfig, amount?: number): string {
   if (payment.customUpiUrl) return payment.customUpiUrl;
-  const params = new URLSearchParams({
-    pa: payment.upiId,
-    pn: payment.payeeName,
-    cu: payment.currency || "INR",
-    tn: payment.note || "Support via Link-in-Bio",
-  });
+  const cleanUpiId = payment.upiId.trim();
+  const payeeName = encodeURIComponent(payment.payeeName.trim());
+  const note = encodeURIComponent((payment.note || "Support").trim());
+  const currency = payment.currency || "INR";
+
+  let url = `upi://pay?pa=${cleanUpiId}&pn=${payeeName}&cu=${currency}&tn=${note}`;
   if (amount && amount > 0) {
-    params.set("am", amount.toFixed(2));
+    url += `&am=${amount.toFixed(2)}`;
   }
-  return `upi://pay?${params.toString()}`;
+  return url;
 }
